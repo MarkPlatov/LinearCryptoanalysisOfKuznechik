@@ -3,8 +3,8 @@ package kuznechik;
 import java.util.Arrays;
 
 public class Crypt {
-	static final int BLOCK_SIZE = 16; // длина блока в байтах
-	static final int VALID_KEY_LEN = 32; // длина ключа в байтах
+	public static final int BLOCK_SIZE = 16; // длина блока в байтах
+	public static final int VALID_KEY_LEN = 32; // длина ключа в байтах
 	
 	// Таблица прямого нелинейного преобразования
 	static final byte[] PI = {
@@ -121,7 +121,7 @@ public class Crypt {
 			{(byte) 0x20, (byte) 0xa8, (byte) 0xed, (byte) 0x9c, (byte) 0x45, (byte) 0xc1, (byte) 0x6a, (byte) 0xf1, (byte) 0x61, (byte) 0x9b, (byte) 0x14, (byte) 0x1e, (byte) 0x58, (byte) 0xd8, (byte) 0xa7, (byte) 0x5e},
 	};
 	// Массив для хранения ключей
-	static private final byte[][] iterKey = new byte[10][64];
+	private byte[][] iterKey = new byte[10][16];
 	
 	
 	// Функция XOR
@@ -235,7 +235,7 @@ public class Crypt {
 	}
 	
 	// Функция расчета раундовых ключей
-	public void expandKey(byte[] key_1, byte[] key_2) {
+	void expandKey(byte[] key_1, byte[] key_2) {
 		byte[][] iter12 = new byte[2][];
 		byte[][] iter34;
 		
@@ -260,7 +260,7 @@ public class Crypt {
 	}
 	
 	// Функция установки ключа
-	public boolean kuzSetKey(byte[] key) {
+	public boolean setKey(byte[] key) {
 		if (key.length != VALID_KEY_LEN) return false;
 		byte[] keyLeft = Arrays.copyOfRange(key, 0, VALID_KEY_LEN / 2);
 		byte[] keyRight = Arrays.copyOfRange(key, VALID_KEY_LEN / 2, VALID_KEY_LEN);
@@ -268,20 +268,32 @@ public class Crypt {
 		return true;
 	}
 	
-	// Функция шифрования блока
-	public byte[] kuzEncrypt(byte[] blk) {
+	public void setIterKey(byte[][] iterKey){
+		this.iterKey = iterKey;
+	}
+	
+	// Функция шифрования блока на numberOfRounds раундов
+	public byte[] encrypt(byte[] blk, int numberOfRounds) {
+		if (numberOfRounds < 1 || numberOfRounds > 9) {
+			System.err.println("Invalid number of rounds");
+			return blk;
+		}
 		byte[] out_blk = blk;
-		for(int i = 0; i < 9; i++) {
+		for(int i = 0; i < numberOfRounds; i++) {
 			out_blk = xor(iterKey[i], out_blk);
 			out_blk = funcS(out_blk, false);
 			out_blk = transformL(out_blk);
 		}
-		out_blk = xor(out_blk, iterKey[9]);
 		return out_blk;
 	}
 	
+	// Функция шифрования блока
+	public byte[] encryptFull(byte[] blk) {
+		return xor(encrypt(blk, 9), iterKey[9]);
+	}
+	
 	// Функция расшифрования блока
-	public byte[] kuzDecrypt(byte[] blk) {
+	public byte[] decryptFull(byte[] blk) {
 		byte[] out_blk = blk;
 		
 		out_blk = xor(out_blk, iterKey[9]);
