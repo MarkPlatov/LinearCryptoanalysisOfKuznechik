@@ -1,5 +1,7 @@
 package kuznechik;
 
+import utils.Utils;
+
 import java.util.Arrays;
 
 public class Crypt {
@@ -270,12 +272,17 @@ public class Crypt {
 	
 	public void setIterKey(byte[][] iterKey){
 		this.iterKey = iterKey;
+//		Utils.printArrayOfHexArrays(iterKey);
+	}
+	
+	public byte[][] getIterKey(){
+		return this.iterKey;
 	}
 	
 	// Функция шифрования блока на numberOfRounds раундов
 	public byte[] encrypt(byte[] blk, int numberOfRounds) {
 		if (numberOfRounds < 1 || numberOfRounds > 9) {
-			System.err.println("Invalid number of rounds");
+			System.err.println("Invalid number of rounds. For full encrypt call encryptFull(byte[] blk)");
 			return blk;
 		}
 		byte[] out_blk = blk;
@@ -287,7 +294,58 @@ public class Crypt {
 		return out_blk;
 	}
 	
-	// Функция шифрования блока
+	// Функция шифрования блока на numberOfRounds раундов
+	public byte[][] encryptPerRound(byte[] blk, int numberOfRounds) {
+		if (numberOfRounds < 1 || numberOfRounds > 9) {
+			System.err.println("Invalid number of rounds. For full encrypt call encryptFull(byte[] blk)");
+			return new byte[][]{blk};
+		}
+		byte[][] out_blk = new byte[numberOfRounds + 1][BLOCK_SIZE];
+		out_blk[0] = blk;
+		for(int i = 1; i < numberOfRounds + 1; i++) {
+			out_blk[i] = xor(iterKey[i], out_blk[i - 1]);
+			out_blk[i] = funcS(out_blk[i], false);
+			out_blk[i] = transformL(out_blk[i]);
+		}
+		return out_blk;
+	}
+	
+	public byte[] encryptPrintAllSteps(byte[] blk, int numberOfRounds) {
+		if (numberOfRounds < 1 || numberOfRounds > 9) {
+			System.err.println("Invalid number of rounds. For full encrypt call encryptFull(byte[] blk)");
+			return blk;
+		}
+		byte[] out_blk = blk;
+		
+//		System.out.println("in = \n" + Utils.byteArrToHexStr(blk));
+//		System.out.println("Number of rounds = " + numberOfRounds);
+//		System.out.println("Iteration keys = ");
+//		Utils.printArrayOfHexArrays(iterKey);
+		
+		for(int i = 0; i < numberOfRounds; i++) {
+			System.out.println("Round #" + i);
+			System.out.println("in = \n" + Utils.byteArrToHexStr(out_blk));
+			out_blk = xor(iterKey[i], out_blk);
+			System.out.println(
+					"xor(iterKey[i], out_blk) = \n" +
+					Utils.byteArrToHexStr(out_blk)
+			);
+			out_blk = funcS(out_blk, false);
+			System.out.println(
+					"funcS(out_blk, false) = \n" +
+					Utils.byteArrToHexStr(out_blk)
+			);
+			out_blk = transformL(out_blk);
+			System.out.println(
+					"transformL(out_blk) = \n" +
+					Utils.byteArrToHexStr(out_blk)
+			);
+		}
+		System.out.println();
+		return out_blk;
+	}
+		
+		// Функция шифрования блока
 	public byte[] encryptFull(byte[] blk) {
 		return xor(encrypt(blk, 9), iterKey[9]);
 	}

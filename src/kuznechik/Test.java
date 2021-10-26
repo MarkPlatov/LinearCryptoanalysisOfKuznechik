@@ -3,13 +3,15 @@ package kuznechik;
 import utils.Utils;
 import java.util.Arrays;
 
+import static utils.Constants.*;
+
 public class Test {
     
    
     public static void runTest() {
-        byte[] key = Utils.EXAMPLE_KUZNECHIK_KEY;
-        byte[] blk = Utils.EXAMPLE_KUZNECHIK_DECRYPTED_TEXT;
-        byte[] enc = Utils.EXAMPLE_KUZNECHIK_ENCRYPTED_TEXT;
+        byte[] key = EXAMPLE_KUZNECHIK_KEY;
+        byte[] blk = EXAMPLE_KUZNECHIK_DECRYPTED_TEXT;
+        byte[] enc = EXAMPLE_KUZNECHIK_ENCRYPTED_TEXT;
         
         Crypt crypt = new Crypt();
         if (!crypt.setKey(key)) {
@@ -29,7 +31,7 @@ public class Test {
         System.out.printf("Data: \n%s", Utils.byteArrToHexStr(decryptBlock, false));
     }
 }
-    /* __Valid Values__
+    /* __Valid Test  result__
     Key :
         {
         (byte) 0x77, (byte) 0x66, (byte) 0x55, (byte) 0x44, (byte) 0x33, (byte) 0x22, (byte) 0x11, (byte) 0x00,

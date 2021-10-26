@@ -2,22 +2,29 @@ package utils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class CryptPair {
 	public byte[] in;
+	public byte[] onPreviousRound;
 	public byte[] out;
 	public int rounds;
 	public byte[][] iterKeys;
 	
-	public CryptPair(byte[] in, byte[] out, int rounds, byte[][] iterKeys) {
+	public CryptPair(
+			byte[] in,
+			byte[] onPreviousRound,
+			byte[] out,
+			int rounds,
+			byte[][] iterKeys) {
 		this.in = in;
+		this.onPreviousRound = onPreviousRound;
 		this.out = out;
 		this.rounds = rounds;
 		this.iterKeys = iterKeys;
 	}
 	public CryptPair() {
 		this.in = null;
+		this.onPreviousRound = null;
 		this.out = null;
 		this.rounds = 666;
 		this.iterKeys = null;
@@ -26,11 +33,13 @@ public class CryptPair {
 	@Override
 	public String toString() {
 		return "CryptPair{" +
-				"in=" + Arrays.toString(in) +
-				", out=" + Arrays.toString(out) +
-				", rounds=" + rounds +
-				", iterKeys=" + Arrays.toString(iterKeys) +
-				'}';
+				"\n     in =              " + Utils.byteArrToHexStr(in) +
+				",\n    onPreviousRound = " + Utils.byteArrToHexStr(onPreviousRound) +
+				",\n    out =             " + Utils.byteArrToHexStr(out) +
+				",\n    rounds =          " + rounds +
+				",\n    iterKeys = {\n" + Utils.byteArrayOfArraysAsHexArraysStr(iterKeys) +
+				"\n}" +
+				"\n}";
 	}
 	
 	public void addToFile(String fileName){
