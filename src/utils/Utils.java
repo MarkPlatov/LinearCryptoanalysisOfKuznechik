@@ -7,14 +7,15 @@ public class Utils {
 	
 	
 	public static String byteArrToHexStr(byte[] a, boolean printByteWord){
+		if (a == null) return "null";
 		String s = "{";
 		String byteWord = printByteWord ? "(byte) " : "";
-		for (int i = 0; i < 15; i++) {
+		for (int i = 0; i < a.length - 1; i++) {
 			String leadingZero = (a[i] < 16 && a[i] > -1) ? "0" : "";
 			s = String.format("%s%s0x%s%x, ", s, byteWord, leadingZero, a[i]);
 		}
-		String leadingZero = (a[15] < 16 && a[15] > -1) ? "0" : "";
-		s = String.format("%s%s0x%s%x}", s, byteWord, leadingZero, a[15]);
+		String leadingZero = (a[a.length-1] < 16 && a[a.length-1] > -1) ? "0" : "";
+		s = String.format("%s%s0x%s%x}", s, byteWord, leadingZero, a[a.length-1]);
 		return s;
 	}
 	public static String byteArrToHexStr(byte[] a) {

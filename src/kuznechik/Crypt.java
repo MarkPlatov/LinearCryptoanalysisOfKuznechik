@@ -294,6 +294,23 @@ public class Crypt {
 		return out_blk;
 	}
 	
+	// Функция шифрования блока на 1 раунд
+	public byte[] encryptOneRoundZeroKey(byte[] blk) {
+		byte[] out_blk = blk;
+		out_blk = xor(
+				new byte[]{
+						(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+						(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+						(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+						(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+				},
+				out_blk);
+		out_blk = funcS(out_blk, false);
+		out_blk = transformL(out_blk);
+		
+		return out_blk;
+	}
+	
 	// Функция шифрования блока на numberOfRounds раундов
 	public byte[][] encryptPerRound(byte[] blk, int numberOfRounds) {
 		if (numberOfRounds < 1 || numberOfRounds > 9) {
@@ -356,6 +373,23 @@ public class Crypt {
 		
 		out_blk = xor(out_blk, iterKey[9]);
 		for(int i = 8; i >= 0; i--) {
+			out_blk = transformLReverse(out_blk);
+			out_blk = funcS(out_blk, true);
+			out_blk = xor(iterKey[i], out_blk);
+		}
+		return out_blk;
+	}
+	
+	// Функция расшифрования блока
+	public byte[] decrypt(byte[] blk, int numberOfRounds) {
+		byte[] out_blk = blk;
+		
+		if (numberOfRounds == 9) {
+			out_blk = xor(out_blk, iterKey[9]);
+			numberOfRounds --;
+		}
+		
+		for(int i = numberOfRounds; i >= 0; i--) {
 			out_blk = transformLReverse(out_blk);
 			out_blk = funcS(out_blk, true);
 			out_blk = xor(iterKey[i], out_blk);

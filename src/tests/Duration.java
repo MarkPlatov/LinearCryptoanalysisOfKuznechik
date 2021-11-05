@@ -60,7 +60,7 @@ public class Duration {
 		Vector<CryptPair> goodOuts;
 		
 		start = System.currentTimeMillis();
-		goodOuts = Prelude.oneBlockNotNull(numberOfRounds, verbose, goodByte);
+		goodOuts = Prelude.oneBlockNotNullGood(numberOfRounds, verbose, goodByte);
 		
 //		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
 //		for (CryptPair cp : goodOuts) System.out.println(cp);
@@ -80,10 +80,67 @@ public class Duration {
 		Vector<CryptPair> goodOuts;
 		
 		start = System.currentTimeMillis();
-		goodOuts = Prelude.twoBlockNotNull(numberOfRounds, verbose, goodByte);
+		goodOuts = Prelude.twoBlockNotNullGood(numberOfRounds, verbose, goodByte);
 		
 //		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
 //		for (CryptPair cp : goodOuts) System.out.println(cp);
+		
+		testStop(start, stop);
+	}
+	
+	/**
+	 * Засекает время выполнения Prelude.oneBlockNotNull(numberOfRounds)
+	 *
+	 * Шифрует всевозможные входы с ПЕРВЫМ ненулевым блоком
+	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
+	 * Возвращает массив ШТ
+	 **/
+	public static void twoBlockNotNullMultTreads(int numberOfRounds, boolean verbose, byte goodByte){
+		long start, stop = 0;
+		
+		start = System.currentTimeMillis();
+		Prelude.twoBlockNotNullGoodMultipleTr(numberOfRounds, verbose, goodByte);
+		
+//		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
+//		for (CryptPair cp : goodOuts) System.out.println(cp);
+		
+		testStop(start, stop);
+	}
+	
+	/**
+	 * Засекает время выполнения функций:
+	 *      Prelude.oneBlockNotNullGood(numberOfRounds, verbose, goodByte);
+	 * 		Prelude.twoBlockNotNullGood(numberOfRounds, verbose, goodByte);
+	 * 		Prelude.oneBlockNotNullEq(numberOfRounds, verbose, goodByte);
+	 * 		Prelude.twoBlockNotNullEq(numberOfRounds, verbose, goodByte);
+	 **/
+	public static void allTests(int numberOfRounds, boolean verbose, byte goodByte){
+		long start, stop = 0;
+		Vector<CryptPair> goodOuts;
+		
+		start = System.currentTimeMillis();
+		Prelude.oneBlockNotNullGood(numberOfRounds, verbose, goodByte);
+		Prelude.twoBlockNotNullGood(numberOfRounds, verbose, goodByte);
+		Prelude.oneBlockNotNullEq(numberOfRounds, verbose, goodByte);
+		Prelude.twoBlockNotNullEq(numberOfRounds, verbose, goodByte);
+
+//		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
+//		for (CryptPair cp : goodOuts) System.out.println(cp);
+		
+		testStop(start, stop);
+	}
+	
+	/**
+	 * Засекает время выполнения функций:
+	 *
+	 *      Prelude.oneTwoBlockNotNullGoodDecrypt(numberOfRounds, verbose, goodByte);
+	 *
+	 **/
+	public static void oneTwoDecryptTests(int numberOfRounds, byte goodByte){
+		long start, stop = 0;
+		
+		start = System.currentTimeMillis();
+		Prelude.oneTwoBlockNotNullGoodDecrypt(numberOfRounds, goodByte);
 		
 		testStop(start, stop);
 	}

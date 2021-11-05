@@ -7,12 +7,15 @@ public class Main {
 	
 	
 	public static void main (String[] args) {
-//		Duration.oneBlockFirstNotNull(1, true);
-//		Duration.oneBlockNotNull(1, false);
-//			System.out.println(	65025 * 119);
-//		Builder.buildAllEntriesTwoNotNullBlock((byte)0x00);
-		Duration.twoBlockNotNull(1, false, (byte) 0x00);
-//		Duration.oneBlockFirstNotNull(9, false, (byte) 0xa5);
+		byte zero = 0x00;
+		boolean verbose = false;
+		int rounds = 1;
+		
+//		Duration.oneBlockNotNull(1, false,zero);
+//		Duration.twoBlockNotNull(1, false, (byte) 0x00);
+		Duration.twoBlockNotNullMultTreads(1, false, (byte) 0x00);
+//		Duration.allTests(9, false, (byte) 0x00);
+//		Duration.oneTwoDecryptTests(1, (byte) 0x00);
 //		Duration.oneBlockNotNull(9, false, (byte) 0x00);
 	}
 	

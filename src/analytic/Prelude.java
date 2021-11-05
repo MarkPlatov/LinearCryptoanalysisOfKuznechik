@@ -10,8 +10,50 @@ import java.util.Vector;
 
 import static utils.Constants.*;
 
+
+class cryptThread extends Thread {
+	public byte[][] entries;
+	
+	public cryptThread(){
+		entries = Builder.buildAllEntriesTwoNotNullBlock((byte) 0x00);
+	}
+	public cryptThread(byte[][] entries){
+		this.entries = entries;
+	}
+	
+	@Override
+	public void run() {
+		System.out.println("Запущен поток  " + getName());
+		Prelude.processEncForGoodOuts(entries, 1, (byte)0x00);
+		System.out.println("Завершён поток " + getName());
+	}
+}
+
 public class Prelude {
 	
+	
+	/**
+	 * Шифрует всевозможные входы с ОДНИМ ненулевым блоком
+	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
+	 * Возвращает массив ШТ
+	 **/
+	public static void twoBlockNotNullGoodMultipleTr(int numberOfRounds, boolean verbose, byte goodByte) {
+		System.out.println("Initialisation...");
+		byte[][] iterKey = Builder.get10EqualIterKeysFromKey(new byte[]{
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		});
+		int treads = 12;
+		byte[][] entries = Builder.buildAllEntriesTwoNotNullBlock((byte)0x00);
+		int entriesPartsLen = entries.length / treads;
+		byte[][][] entriesParts = new byte[treads][entriesPartsLen][BLOCK_SIZE];
+		for (int i = 0; i < treads; i++) {
+			System.arraycopy(entries, i * entriesPartsLen, entriesParts[i], 0, entriesPartsLen );
+		}
+		for (int i = 0; i < treads; i++) {
+			(new cryptThread(entriesParts[i])).start();
+		}
+	}
 	
 	/**
 	 * Шифрует всевозможные входы с ОДНИМ ненулевым блоком
@@ -26,7 +68,7 @@ public class Prelude {
 		
 		byte[][] entries = Builder.buildAllEntriesOneNotNullBlock();
 		
-		return processEncForGoodOuts(
+		return processEncForGoodOutsWithKeys(
 				entries,
 				iterKeys,
 				numberOfRounds,
@@ -67,20 +109,13 @@ public class Prelude {
 	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
 	 * Возвращает массив ШТ
 	 **/
-	public static Vector<CryptPair> oneBlockNotNull(int numberOfRounds, boolean verbose, byte goodByte) {
+	public static Vector<CryptPair> oneBlockNotNullGood(int numberOfRounds, boolean verbose, byte goodByte) {
 		System.out.println("Initialisation...");
 		byte[][] iterKey = Builder.get10EqualIterKeysFromKey(new byte[]{
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		});
 		byte[][] entries = Builder.buildAllEntriesOneNotNullBlock();
-		
-/*		return processEncForGoodOuts(
-				entries,
-				new byte[][][]{iterKey},
-				numberOfRounds,
-				verbose,
-				goodByte);*/
 		
 		return processEncForGoodOutsPerRounds(
 				entries,
@@ -89,13 +124,27 @@ public class Prelude {
 				verbose,
 				goodByte);
 	}
-	
+	public static Vector<CryptPair> oneBlockNotNullEq(int numberOfRounds, boolean verbose, byte goodByte) {
+		System.out.println("Initialisation...");
+		byte[][] iterKey = Builder.get10EqualIterKeysFromKey(new byte[]{
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		});
+		byte[][] entries = Builder.buildAllEntriesOneNotNullBlock();
+		
+		return processEncForEqualOutsPerRounds(
+				entries,
+				new byte[][][]{iterKey},
+				numberOfRounds,
+				verbose,
+				goodByte);
+	}
 	/**
 	 * Шифрует всевозможные входы с ОДНИМ ненулевым блоком
 	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
 	 * Возвращает массив ШТ
 	 **/
-	public static Vector<CryptPair> twoBlockNotNull(int numberOfRounds, boolean verbose, byte goodByte) {
+	public static Vector<CryptPair> twoBlockNotNullGood(int numberOfRounds, boolean verbose, byte goodByte) {
 		System.out.println("Initialisation...");
 		byte[][] iterKey = Builder.get10EqualIterKeysFromKey(new byte[]{
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -103,14 +152,47 @@ public class Prelude {
 		});
 		byte[][] entries = Builder.buildAllEntriesTwoNotNullBlock((byte)0x00);
 
-/*		return processEncForGoodOuts(
+		return processEncForGoodOuts(
+				entries,
+//				iterKey,
+				numberOfRounds,
+				goodByte
+		);
+	}
+	
+	/**
+	 * Дешифрует всевозможные выходы с ОДНИМ и ДВУМЯ ненулевым блоком
+	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
+	 **/
+	public static Vector<CryptPair> oneTwoBlockNotNullGoodDecrypt(int numberOfRounds, byte goodByte) {
+		System.out.println("Initialisation...");
+		byte[][] iterKey = Builder.get10EqualIterKeysFromKey(new byte[]{
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		});
+		byte[][] oneBlock = Builder.buildAllEntriesOneNotNullBlock();
+		byte[][] twoBlock = Builder.buildAllEntriesTwoNotNullBlock((byte)0x00);
+		byte[][] entries = new byte[oneBlock.length + twoBlock.length][oneBlock[0].length];
+		System.arraycopy(oneBlock, 0, entries, 0, oneBlock.length);
+		System.arraycopy(twoBlock, 0, entries, oneBlock.length, twoBlock.length);
+		
+		return processDecryptForGoodOuts(
 				entries,
 				new byte[][][]{iterKey},
 				numberOfRounds,
-				verbose,
 				goodByte
-		);*/
-		return processEncForGoodOutsPerRounds(
+		);
+	}
+	
+	public static Vector<CryptPair> twoBlockNotNullEq(int numberOfRounds, boolean verbose, byte goodByte) {
+		System.out.println("Initialisation...");
+		byte[][] iterKey = Builder.get10EqualIterKeysFromKey(new byte[]{
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		});
+		byte[][] entries = Builder.buildAllEntriesTwoNotNullBlock((byte)0x00);
+		
+		return processEncForEqualOutsPerRounds(
 				entries,
 				new byte[][][]{iterKey},
 				numberOfRounds,
@@ -146,7 +228,7 @@ public class Prelude {
 	 * Шифрует заданные входы всеми заданными ключами заданное кол-во раундов.
 	 * Возвращает "хорошие" пары ОТ + ШТ
 	**/
-	public static Vector<CryptPair> processEncForGoodOuts(
+	public static Vector<CryptPair> processEncForGoodOutsWithKeys(
 			byte[][] entries,
 			byte[][][] iterKeys,
 			int numberOfRounds,
@@ -193,6 +275,132 @@ public class Prelude {
 					);
 					goodOuts.add(goodOut);
 					fileName = String.format("%s%s.txt", FILE_NAME, goodBytes);
+					goodOut.addToFile(fileName);
+				}
+			}
+			if (i % 1000 == 0) {
+				System.out.println(i + " of " + entries.length + " entries processed");
+			}
+		}
+		System.out.println("Encryption done");
+		return goodOuts;
+	}
+	
+	public static Vector<CryptPair> processEncForGoodOuts(
+			byte[][] entries,
+//			byte[][] iterKeys,
+			int numberOfRounds,
+			byte goodByte
+	){
+		byte[] tmpOut;
+//		int numberOfIterKeys = iterKeys.length;
+		int numberOfEntries = entries.length;
+		
+		Vector<CryptPair> goodOuts = new Vector<>();
+		Crypt kusnechik = new Crypt();
+		Validation validation = new Validation(goodByte);
+		
+		
+		System.out.println("Encryption for " +
+				numberOfEntries +
+				" entries with zero key in " +
+				numberOfRounds +
+				" rounds...");
+		
+		int i = 0;
+		int goodBytes;
+		String prefix = "_test1_";
+		String[] fileName = {
+				String.format("%s%s_0_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_1_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_2_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_3_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_4_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_5_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_6_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_7_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_8_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_9_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_10_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_11_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_12_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_13_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_14_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_15_0x00.txt", FILE_NAME, prefix),
+				String.format("%s%s_16_0x00.txt", FILE_NAME, prefix),
+		};
+		
+		byte[][] iterKeys = {{0x00}};
+		
+//		kusnechik.setIterKey(iterKeys);
+		for (byte[] entry : entries) {
+			i ++;
+			tmpOut = kusnechik.encryptOneRoundZeroKey(entry);
+			goodBytes = validation.goodBytesInArr(tmpOut);
+			
+			if (goodBytes > 3) {
+				CryptPair goodOut = new CryptPair(
+						entry,
+						entry,
+						Arrays.copyOf(tmpOut, tmpOut.length),
+						numberOfRounds,
+						iterKeys
+				);
+				goodOuts.add(goodOut);
+				goodOut.addToFile(fileName[goodBytes]);
+			}
+			
+			if (i % 1000000 == 0) {
+				System.out.println(i + " of " + entries.length + " entries processed");
+			}
+		}
+		System.out.println("Encryption done");
+		return goodOuts;
+	}
+	
+	public static Vector<CryptPair> processDecryptForGoodOuts(
+			byte[][] entries,
+			byte[][][] iterKeys,
+			int numberOfRounds,
+//			boolean verbose,
+			byte goodByte
+	){
+		byte[] tmpOut;
+		int numberOfIterKeys = iterKeys.length;
+		int numberOfEntries = entries.length;
+		
+		Vector<CryptPair> goodOuts = new Vector<>();
+		Crypt kusnechik = new Crypt();
+		Validation validation = new Validation(goodByte);
+		
+		
+		System.out.println("Encryption for " +
+				numberOfEntries +
+				" entries with " +
+				numberOfIterKeys +
+				" keys in " +
+				numberOfRounds +
+				" rounds...");
+		
+		int i = 0;
+		int goodBytes;
+		String fileName;
+		for (byte[] entry : entries) {
+			i ++;
+			for (byte[][] iterKey : iterKeys) {
+				kusnechik.setIterKey(iterKey);
+				tmpOut = kusnechik.decrypt(entry, numberOfRounds);
+				goodBytes = validation.goodBytesInArr(tmpOut);
+				if (goodBytes > 2) {
+					CryptPair goodOut = new CryptPair(
+							Arrays.copyOf(tmpOut, tmpOut.length),
+							null,
+							entry,
+							numberOfRounds,
+							iterKey
+					);
+					goodOuts.add(goodOut);
+					fileName = String.format("%s_Decrypt_0x00_%s.txt", FILE_NAME, goodBytes);
 					goodOut.addToFile(fileName);
 				}
 			}
@@ -253,6 +461,66 @@ public class Prelude {
 						);
 						goodOuts.add(goodOut);
 						fileName = String.format("%s%s.txt", fileNameMask, goodBytes);
+						goodOut.addToFile(fileName);
+					}
+				}
+			}
+			if (i % 100000 == 0) {
+				System.out.println(i + " of " + entries.length + " entries processed");
+			}
+		}
+		System.out.println("Encryption done");
+		return goodOuts;
+	}
+	public static Vector<CryptPair> processEncForEqualOutsPerRounds(
+			byte[][] entries,
+			byte[][][] iterKeys,
+			int numberOfRounds,
+			boolean verbose,
+			byte goodByte
+	){
+		byte[][] tmpOut;
+		int numberOfIterKeys = iterKeys.length;
+		int numberOfEntries = entries.length;
+		
+		Vector<CryptPair> goodOuts = new Vector<>();
+		Crypt kusnechik = new Crypt();
+		Validation validation = new Validation(goodByte);
+		
+		
+		System.out.println("Encryption for " +
+				numberOfEntries +
+				" entries with " +
+				numberOfIterKeys +
+				" keys in " +
+				numberOfRounds +
+				" rounds...");
+		
+		int i = 0;
+		int eqBytes;
+		String fileNameMask = String.format("%s_equal_", FILE_NAME);
+		String fileName;
+		for (byte[] entry : entries) {
+			i ++;
+			for (byte[][] iterKey : iterKeys) {
+				kusnechik.setIterKey(iterKey);
+				if (verbose) {
+					System.err.println("The is not possible to verbose this function now");
+					return goodOuts;
+				} else tmpOut = kusnechik.encryptPerRound(entry, numberOfRounds);
+				
+				for (int j = 1; j < tmpOut.length; j ++) {
+					eqBytes = validation.equalBytesInArr(tmpOut[j]);
+					if (eqBytes > 2) {
+						CryptPair goodOut = new CryptPair(
+								entry,
+								Arrays.copyOf(tmpOut[j - 1], tmpOut[j - 1].length),
+								Arrays.copyOf(tmpOut[j], tmpOut[j].length),
+								j,
+								iterKey
+						);
+						goodOuts.add(goodOut);
+						fileName = String.format("%s%s.txt", fileNameMask, eqBytes);
 						goodOut.addToFile(fileName);
 					}
 				}
