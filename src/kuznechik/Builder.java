@@ -1,7 +1,7 @@
 package kuznechik;
 
+import utils.EntriesBuildState;
 import utils.Utils;
-
 import java.util.Arrays;
 
 public class Builder {
@@ -63,6 +63,166 @@ public class Builder {
 		} while (firstNotNullBlock != (byte) 0x00);
 		
 		return out;
+	}
+	
+	public static EntriesBuildState buildAllEntriesThreeNotNullBlock(byte nullBlock, EntriesBuildState in){
+		int places = 560;
+		int pairs = 255 * 255 * 255; // 255 * 255 = 65025;
+		int arrSize = 50000000; // Длина массива, не убивающая память
+		byte[][] outArr = new byte[arrSize][BLOCK_SIZE];
+		EntriesBuildState out = EntriesBuildState.defaultState();
+		byte a = in.a;
+		byte b = in.b;
+		byte c = in.c;
+//		int i = in.i;
+//		int j = in.j;
+//		int k = in.k;
+//		int currentPair = 0;
+//		int currentPlace = 0;
+//		int delta = 0;
+		int currentIndex = 0;
+		boolean firstRun = true;
+//		boolean firstRunDone = false;
+		
+		System.out.println("==============================================");
+		do {               // Цикл по
+			do {           // парам
+				do {       // байт
+					
+					
+					for (int i = firstRun ? in.i : 0; i < BLOCK_SIZE - 2; i++) {       // Цикл по
+						for (int j = firstRun ? in.j : 	i + 1; j < BLOCK_SIZE - 1; j++) {   // размещениям
+							for (int k = firstRun ? in.k : j + 1; k < BLOCK_SIZE; k++) {   // пар байт
+								firstRun = false;
+								
+								
+/*								if (
+										a == (byte)0xff &&
+										b == (byte)0xc4 &&
+										c == (byte)0x30 &&
+//										i == 3 &&
+//										j == 7 &&
+										currentIndex > arrSize - 500
+								) {
+									System.out.println("Hello first " + currentIndex);
+									System.out.printf("a = %#X\n", a);
+									System.out.printf("b = %#X\n", b);
+									System.out.printf("c = %#X\n", c);
+									System.out.println("i = " + i);
+									System.out.println("j = " + j);
+									System.out.println("k = " + k);
+									System.out.println();
+								}
+								if (
+										a == (byte)0xff &&
+										b == (byte)0xc4 &&
+										c >= (byte)0x30 &&
+										i == 3 &&
+										j >= 7 &&
+										currentIndex < 500
+								) {
+									System.out.println("Hello second " + currentIndex);
+									System.out.printf("a = %#X\n", a);
+									System.out.printf("b = %#X\n", b);
+									System.out.printf("c = %#X\n", c);
+									System.out.println("i = " + i);
+									System.out.println("j = " + j);
+									System.out.println("k = " + k);
+									System.out.println();
+								}
+								if (
+										((a == (byte)0xff &&
+										b == (byte)0xff &&
+										c == (byte)0xff) ||
+										a == (byte)0x00 )
+//										i == 3 &&
+//										j >= 7 &&
+//										currentIndex < 500
+								) {
+									System.out.println("Hello ff " + currentIndex);
+									System.out.printf("a = %#X\n", a);
+									System.out.printf("b = %#X\n", b);
+									System.out.printf("c = %#X\n", c);
+									System.out.println("i = " + i);
+									System.out.println("j = " + j);
+									System.out.println("k = " + k);
+									System.out.println();
+								}*/
+								
+//								if (!firstRunDone && i == 13 && j == 14 && k == 15){
+//									firstRunDone = true;
+//									delta -= places - (currentPair * places + currentPlace);
+//								}
+//								if (currentPair * places + currentPlace > arrSize - 560 ||
+//										currentPair * places + currentPlace < 1560
+//								) {
+//									if (currentIndex > arrSize - 560 ||
+//										currentIndex < 1560
+//								) {
+//
+////									System.out.println("Hello " + (currentPair * places + currentPlace));
+//									System.out.println("Hello " + currentIndex);
+//									System.out.printf("a = %#X\n", a);
+//									System.out.printf("b = %#X\n", b);
+//									System.out.printf("c = %#X\n", c);
+//									System.out.println("i = " + i);
+//									System.out.println("j = " + j);
+//									System.out.println("k = " + k);
+//									System.out.println();
+//								}
+//								Контроль переполнения
+					/*			if (currentPair * places + currentPlace == arrSize){*/
+								if (
+										a == (byte)0xff &&
+										b == (byte)0xff &&
+										c == (byte)0xff &&
+										i == 13 &&
+										j == 14 &&
+										k == 15
+								) {
+									out = EntriesBuildState.finalState(outArr);
+									return out;
+								}
+								if (currentIndex == arrSize){
+									System.out.printf(
+											"a = %#x\nb = %#x\nc = %#x\ni = %d\nj = %d\nk = %d\n",
+											a, b, c, i, j, k
+									);
+									System.out.println("currentIndex " + currentIndex);
+									out = new EntriesBuildState(a, b, c, i, j, k, outArr);
+									return out;
+								}
+
+//								Arrays.fill(outArr[currentPair * places + currentPlace], nullBlock);
+//								outArr[currentPair * places + currentPlace][i] = a;
+//								outArr[currentPair * places + currentPlace][j] = b;
+//								outArr[currentPair * places + currentPlace][k] = c;
+								Arrays.fill(outArr[currentIndex], nullBlock);
+								outArr[currentIndex][i] = a;
+								outArr[currentIndex][j] = b;
+								outArr[currentIndex][k] = c;
+					/*			currentPlace++;*/
+								currentIndex ++;
+								
+								
+							}
+						}
+					}
+					/*currentPlace = 0;
+					currentPair ++;*/
+//					System.out.println(currentPair);
+					
+					c += 0x01;
+				} while (c != (byte) 0x00);
+				b += 0x01;
+				c = 0x01;
+			} while (b != (byte) 0x00);
+			a += 0x01;
+			b = 0x01;
+		} while (a != (byte) 0x00);
+		
+		return out;
+//		return new byte[][]{{}};
 	}
 	
 	public static byte[][] buildEntriesFirstBlockNotNull(){

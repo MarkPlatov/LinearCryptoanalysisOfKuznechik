@@ -177,7 +177,7 @@ public class Duration {
 		
 	}
 	
-	private static void testStop(long start, long stop) {
+	public static void testStop(long start, long stop) {
 		stop = System.currentTimeMillis();
 		double duration;
 		duration = stop - start;

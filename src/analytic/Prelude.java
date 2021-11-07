@@ -4,6 +4,7 @@ import kuznechik.Builder;
 import kuznechik.Crypt;
 import tests.Validation;
 import utils.CryptPair;
+import utils.EntriesBuildState;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -11,13 +12,13 @@ import java.util.Vector;
 import static utils.Constants.*;
 
 
-class cryptThread extends Thread {
+class CryptThread extends Thread {
 	public byte[][] entries;
 	
-	public cryptThread(){
+	public CryptThread(){
 		entries = Builder.buildAllEntriesTwoNotNullBlock((byte) 0x00);
 	}
-	public cryptThread(byte[][] entries){
+	public CryptThread(byte[][] entries){
 		this.entries = entries;
 	}
 	
@@ -43,16 +44,49 @@ public class Prelude {
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		});
-		int treads = 12;
-		byte[][] entries = Builder.buildAllEntriesTwoNotNullBlock((byte)0x00);
-		int entriesPartsLen = entries.length / treads;
-		byte[][][] entriesParts = new byte[treads][entriesPartsLen][BLOCK_SIZE];
-		for (int i = 0; i < treads; i++) {
-			System.arraycopy(entries, i * entriesPartsLen, entriesParts[i], 0, entriesPartsLen );
+		int treadsNum = 12;
+		CryptThread[] treads = new CryptThread[treadsNum];
+		
+//		byte[][] entries = Builder.buildAllEntriesTwoNotNullBlock((byte)0x00);
+		
+		EntriesBuildState state = Builder.buildAllEntriesThreeNotNullBlock((byte)0x00, EntriesBuildState.defaultState());
+		
+		while (!state.isStateFinal()){
+			state = Builder.buildAllEntriesThreeNotNullBlock((byte) 0x00, state);
+			System.out.println();
+			System.out.println();
+			System.gc();
 		}
-		for (int i = 0; i < treads; i++) {
-			(new cryptThread(entriesParts[i])).start();
-		}
+//		byte[][] entries = state.out;
+//		int entriesPartsLen = entries.length / treadsNum + 1;
+//		int delta = 0;
+//		byte[][][] entriesParts = new byte[treadsNum][entriesPartsLen][BLOCK_SIZE];
+//		for (int i = 0; i < treadsNum; i++) {
+//			if (i == treadsNum - 1) {
+//				delta = entriesPartsLen * treadsNum - entries.length;
+//			}
+//			System.arraycopy(
+//					entries,
+//					i * entriesPartsLen,
+//					entriesParts[i],
+//					0,
+//					entriesPartsLen - delta);
+//		}
+//
+//		for (int i = 0; i < treadsNum; i++) {
+//			treads[i] = new CryptThread(entriesParts[i]);
+//			treads[i].start();
+//		}
+//		for (int i = 0; i < treadsNum; i++) {
+//			try {
+//				treads[i].join();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//
+		
+		
 	}
 	
 	/**
@@ -309,7 +343,7 @@ public class Prelude {
 		
 		int i = 0;
 		int goodBytes;
-		String prefix = "_test1_";
+		String prefix = "_test2_";
 		String[] fileName = {
 				String.format("%s%s_0_0x00.txt", FILE_NAME, prefix),
 				String.format("%s%s_1_0x00.txt", FILE_NAME, prefix),

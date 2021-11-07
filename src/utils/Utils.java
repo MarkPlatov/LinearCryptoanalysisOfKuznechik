@@ -4,7 +4,9 @@ import java.util.Random;
 
 public class Utils {
 	
-	
+	public static void log(String s){
+		String file = Constants.FILE_NAME;
+	}
 	
 	public static String byteArrToHexStr(byte[] a, boolean printByteWord){
 		if (a == null) return "null";
