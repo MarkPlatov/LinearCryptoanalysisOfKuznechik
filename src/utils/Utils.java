@@ -1,11 +1,27 @@
 package utils;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Random;
 
 public class Utils {
 	
-	public static void log(String s){
-		String file = Constants.FILE_NAME;
+	public static void log(String text){
+		String file = Constants.FILE_NAME + "/log.txt";
+		writeToFile(text, file);
+	}
+	
+	public static void writeToFile(String text, String file){
+		try(FileOutputStream fos=new FileOutputStream(file, true))
+		{
+			// перевод строки в байты
+			byte[] buffer = text.getBytes();
+			fos.write(buffer, 0, buffer.length);
+			fos.flush();
+		}
+		catch(IOException ex){
+			System.err.println(ex.getMessage());
+		}
 	}
 	
 	public static String byteArrToHexStr(byte[] a, boolean printByteWord){

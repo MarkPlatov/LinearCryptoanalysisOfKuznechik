@@ -23,11 +23,6 @@ public class Duration {
 		start = System.currentTimeMillis();
 		Vector<CryptPair> goodOuts = Prelude.oneBlockFull(numberOfKeys, numberOfRounds, verbose, goodByte);
 		
-//		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
-//		for (CryptPair cp : goodOuts) {
-//			System.out.println(cp);
-//		}
-		
 		testStop(start, stop);
 	}
 	
@@ -62,9 +57,6 @@ public class Duration {
 		start = System.currentTimeMillis();
 		goodOuts = Prelude.oneBlockNotNullGood(numberOfRounds, verbose, goodByte);
 		
-//		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
-//		for (CryptPair cp : goodOuts) System.out.println(cp);
-		
 		testStop(start, stop);
 	}
 	
@@ -82,9 +74,6 @@ public class Duration {
 		start = System.currentTimeMillis();
 		goodOuts = Prelude.twoBlockNotNullGood(numberOfRounds, verbose, goodByte);
 		
-//		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
-//		for (CryptPair cp : goodOuts) System.out.println(cp);
-		
 		testStop(start, stop);
 	}
 	
@@ -95,14 +84,11 @@ public class Duration {
 	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
 	 * Возвращает массив ШТ
 	 **/
-	public static void twoBlockNotNullMultTreads(int numberOfRounds, boolean verbose, byte goodByte){
+	public static void threeBlockNotNullMultTreads(int numberOfRounds, boolean verbose, byte goodByte){
 		long start, stop = 0;
 		
 		start = System.currentTimeMillis();
-		Prelude.twoBlockNotNullGoodMultipleTr(numberOfRounds, verbose, goodByte);
-		
-//		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
-//		for (CryptPair cp : goodOuts) System.out.println(cp);
+		Prelude.threeBlockNotNullGoodMultipleTr(numberOfRounds, verbose, goodByte);
 		
 		testStop(start, stop);
 	}
@@ -123,9 +109,6 @@ public class Duration {
 		Prelude.twoBlockNotNullGood(numberOfRounds, verbose, goodByte);
 		Prelude.oneBlockNotNullEq(numberOfRounds, verbose, goodByte);
 		Prelude.twoBlockNotNullEq(numberOfRounds, verbose, goodByte);
-
-//		System.out.println("Printing \"Good\" outs to " + FILE_NAME + " :");
-//		for (CryptPair cp : goodOuts) System.out.println(cp);
 		
 		testStop(start, stop);
 	}
@@ -182,8 +165,10 @@ public class Duration {
 		double duration;
 		duration = stop - start;
 		
-		System.out.println("Test takes " + duration + " milliseconds");
-		System.out.println("Test takes " + duration / 1000 + " seconds");
-		System.out.println("Test takes " + duration / 1000 / 60 + " minutes");
+		String timeLog = "Test takes " + duration + " milliseconds\n" +
+							"Test takes " + duration / 1000 + " seconds\n" +
+							"Test takes " + duration / 1000 / 60 + " minutes\n";
+		System.out.println(timeLog);
+		Utils.log(timeLog);
 	}
 }

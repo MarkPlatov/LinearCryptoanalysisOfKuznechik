@@ -68,7 +68,7 @@ public class Builder {
 	public static EntriesBuildState buildAllEntriesThreeNotNullBlock(byte nullBlock, EntriesBuildState in){
 		int places = 560;
 		int pairs = 255 * 255 * 255; // 255 * 255 = 65025;
-		int arrSize = 50000000; // Длина массива, не убивающая память
+		int arrSize = 25000000; // Длина массива, не убивающая память
 		byte[][] outArr = new byte[arrSize][BLOCK_SIZE];
 		EntriesBuildState out = EntriesBuildState.defaultState();
 		byte a = in.a;
@@ -82,6 +82,7 @@ public class Builder {
 //		int delta = 0;
 		int currentIndex = 0;
 		boolean firstRun = true;
+		String log;
 //		boolean firstRunDone = false;
 		
 		System.out.println("==============================================");
@@ -184,11 +185,12 @@ public class Builder {
 									return out;
 								}
 								if (currentIndex == arrSize){
-									System.out.printf(
-											"a = %#x\nb = %#x\nc = %#x\ni = %d\nj = %d\nk = %d\n",
-											a, b, c, i, j, k
+									log = String.format(
+											"\na = %#x\nb = %#x\nc = %#x\ni = %d\nj = %d\nk = %d\ncurrentIndex = %d\n",
+											a, b, c, i, j, k, currentIndex
 									);
-									System.out.println("currentIndex " + currentIndex);
+									System.out.println(log);
+									Utils.log(log);
 									out = new EntriesBuildState(a, b, c, i, j, k, outArr);
 									return out;
 								}

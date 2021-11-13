@@ -7,6 +7,12 @@ import java.util.Arrays;
 public class Crypt {
 	public static final int BLOCK_SIZE = 16; // длина блока в байтах
 	public static final int VALID_KEY_LEN = 32; // длина ключа в байтах
+	public static final byte[] ZERO_ROUND_KEY = new byte[]{
+			(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+			(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+			(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+			(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+	};
 	
 	// Таблица прямого нелинейного преобразования
 	static final byte[] PI = {
@@ -270,62 +276,25 @@ public class Crypt {
 		return true;
 	}
 	
-	public void setIterKey(byte[][] iterKey){
-		this.iterKey = iterKey;
-//		Utils.printArrayOfHexArrays(iterKey);
-	}
+	public void setIterKey(byte[][] iterKey){ this.iterKey = iterKey;}
 	
-	public byte[][] getIterKey(){
-		return this.iterKey;
-	}
+	public byte[][] getIterKey(){ return this.iterKey;}
 	
-	// Функция шифрования блока на numberOfRounds раундов
-	public byte[] encrypt(byte[] blk, int numberOfRounds) {
-		if (numberOfRounds < 1 || numberOfRounds > 9) {
-			System.err.println("Invalid number of rounds. For full encrypt call encryptFull(byte[] blk)");
-			return blk;
-		}
-		byte[] out_blk = blk;
-		for(int i = 0; i < numberOfRounds; i++) {
-			out_blk = xor(iterKey[i], out_blk);
-			out_blk = funcS(out_blk, false);
-			out_blk = transformL(out_blk);
-		}
-		return out_blk;
-	}
 	
 	// Функция шифрования блока на 1 раунд
 	public byte[] encryptOneRoundZeroKey(byte[] blk) {
 		byte[] out_blk = blk;
-		out_blk = xor(
-				new byte[]{
-						(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-						(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-						(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-						(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-				},
-				out_blk);
 		out_blk = funcS(out_blk, false);
 		out_blk = transformL(out_blk);
-		
 		return out_blk;
 	}
-	
-	// Функция шифрования блока на numberOfRounds раундов
-	public byte[][] encryptPerRound(byte[] blk, int numberOfRounds) {
-		if (numberOfRounds < 1 || numberOfRounds > 9) {
-			System.err.println("Invalid number of rounds. For full encrypt call encryptFull(byte[] blk)");
-			return new byte[][]{blk};
-		}
-		byte[][] out_blk = new byte[numberOfRounds + 1][BLOCK_SIZE];
-		out_blk[0] = blk;
-		for(int i = 1; i < numberOfRounds + 1; i++) {
-			out_blk[i] = xor(iterKey[i], out_blk[i - 1]);
-			out_blk[i] = funcS(out_blk[i], false);
-			out_blk[i] = transformL(out_blk[i]);
-		}
+	public byte[] decryptOneRoundZeroKey(byte[] blk) {
+		byte[] out_blk = blk;
+		out_blk = transformLReverse(out_blk);
+		out_blk = funcS(out_blk, true);
 		return out_blk;
 	}
+
 	
 	public byte[] encryptPrintAllSteps(byte[] blk, int numberOfRounds) {
 		if (numberOfRounds < 1 || numberOfRounds > 9) {
@@ -333,11 +302,6 @@ public class Crypt {
 			return blk;
 		}
 		byte[] out_blk = blk;
-		
-//		System.out.println("in = \n" + Utils.byteArrToHexStr(blk));
-//		System.out.println("Number of rounds = " + numberOfRounds);
-//		System.out.println("Iteration keys = ");
-//		Utils.printArrayOfHexArrays(iterKey);
 		
 		for(int i = 0; i < numberOfRounds; i++) {
 			System.out.println("Round #" + i);
@@ -393,6 +357,62 @@ public class Crypt {
 			out_blk = transformLReverse(out_blk);
 			out_blk = funcS(out_blk, true);
 			out_blk = xor(iterKey[i], out_blk);
+		}
+		return out_blk;
+	}
+	// Функция шифрования блока на numberOfRounds раундов
+	public byte[] encrypt(byte[] blk, int numberOfRounds) {
+		if (numberOfRounds < 1 || numberOfRounds > 9) {
+			System.err.println("Invalid number of rounds. For full encrypt call encryptFull(byte[] blk)");
+			return blk;
+		}
+		byte[] out_blk = blk;
+		for(int i = 0; i < numberOfRounds; i++) {
+			out_blk = xor(iterKey[i], out_blk);
+			out_blk = funcS(out_blk, false);
+			out_blk = transformL(out_blk);
+		}
+		return out_blk;
+	}
+	
+	public byte[][] decryptPerRound(byte[] blk, int numberOfRounds) {
+		if (numberOfRounds < 1 || numberOfRounds > 9) {
+			System.err.println(numberOfRounds + "is invalid number of rounds");
+			return new byte[][]{blk};
+		}
+		
+		byte[][] out_blk = new byte[numberOfRounds + 1][BLOCK_SIZE];
+		
+		if (numberOfRounds == 9) {
+			out_blk[numberOfRounds] = xor(out_blk[numberOfRounds], iterKey[numberOfRounds]);
+		}
+		
+		out_blk[0] = blk;
+		for(int i = 1; i < numberOfRounds + 1; i++) {
+			out_blk[i] = transformLReverse(out_blk[i - 1]);
+			out_blk[i] = funcS(out_blk[i], true);
+			out_blk[i] = xor(iterKey[i], out_blk[i]);
+		}
+
+		return out_blk;
+	}
+	
+	
+	// Функция шифрования блока на numberOfRounds раундов
+	public byte[][] encryptPerRound(byte[] blk, int numberOfRounds) {
+		if (numberOfRounds < 1 || numberOfRounds > 9) {
+			System.err.println(numberOfRounds + "is invalid number of rounds");
+			return new byte[][]{blk};
+		}
+		byte[][] out_blk = new byte[numberOfRounds + 1][BLOCK_SIZE];
+		out_blk[0] = blk;
+		for(int i = 1; i < numberOfRounds + 1; i++) {
+			out_blk[i] = xor(iterKey[i], out_blk[i - 1]);
+			out_blk[i] = funcS(out_blk[i], false);
+			out_blk[i] = transformL(out_blk[i]);
+		}
+		if (numberOfRounds == 9) {
+			out_blk[numberOfRounds] = xor(out_blk[numberOfRounds], iterKey[numberOfRounds]);
 		}
 		return out_blk;
 	}

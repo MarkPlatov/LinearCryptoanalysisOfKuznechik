@@ -1,8 +1,5 @@
 package utils;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 public class CryptPair {
 	public byte[] in;
 	public byte[] onPreviousRound;
@@ -44,15 +41,16 @@ public class CryptPair {
 	
 	public void addToFile(String fileName){
 		String text = this.toString() + "\n"; // строка для записи
-		try(FileOutputStream fos=new FileOutputStream(fileName, true))
-		{
-			// перевод строки в байты
-			byte[] buffer = text.getBytes();
-			fos.write(buffer, 0, buffer.length);
-		}
-		catch(IOException ex){
-			System.err.println(ex.getMessage());
-		}
+		Utils.writeToFile(text, fileName);
+//		try(FileOutputStream fos=new FileOutputStream(fileName, true))
+//		{
+//			// перевод строки в байты
+//			byte[] buffer = text.getBytes();
+//			fos.write(buffer, 0, buffer.length);
+//		}
+//		catch(IOException ex){
+//			System.err.println(ex.getMessage());
+//		}
 //		System.out.println("The file has been written");
 	}
 }

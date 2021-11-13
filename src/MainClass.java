@@ -1,4 +1,4 @@
-import tests.Duration;
+import analytic.Prelude;
 import utils.Constants;
 
 public class MainClass {
@@ -13,10 +13,9 @@ public class MainClass {
 		
 //		Duration.oneBlockNotNull(1, false,zero);
 //		Duration.twoBlockNotNull(1, false, (byte) 0x00);
-		long start, stop = 0;
-		start = System.currentTimeMillis();
-		Duration.twoBlockNotNullMultTreads(rounds, verbose, zero);
-		Duration.testStop(start, stop);
+
+//		Duration.threeBlockNotNullMultTreads(rounds, verbose, zero);
+		Prelude.interestingEntriesTest();
 //		byte[][] a = Builder.buildAllEntriesThreeNotNullBlock(zero);
 //		Duration.allTests(9, false, (byte) 0x00);
 //		Duration.oneTwoDecryptTests(1, (byte) 0x00);
