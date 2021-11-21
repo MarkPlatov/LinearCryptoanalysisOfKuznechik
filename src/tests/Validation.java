@@ -1,25 +1,12 @@
 package tests;
 
-import kuznechik.Test;
-
 public class Validation {
-	public byte goodByte;
 	
-	public Validation(byte goodByte) {
-		this.goodByte = goodByte;
-	}
-	public Validation() {
-		this.goodByte = (byte) 0x00;
-	}
-	
-	public int goodBytesInArr(byte[] arr){
+	public static int goodBytesInArr(byte[] arr){
 		int goodByteCounter = 0;
-		int badByteCounter = 0;
+		byte goodByte = (byte) 0x00;
 		
-//		for (int i = 0; i < 6; i ++) { if (arr[i] != this.goodByte) badByteCounter ++;}
-//		if (badByteCounter == 6) return 0;
-		
-		for (byte b : arr) { if (b == this.goodByte) goodByteCounter ++; }
+		for (byte b : arr) { if (b == goodByte) goodByteCounter ++; }
 		return goodByteCounter;
 	}
 	
@@ -34,9 +21,5 @@ public class Validation {
 			tmp = 1;
 		}
 		return equalByteCounter;
-	}
-	
-	public static void runKusnechicTest(){
-		Test.runTest();
 	}
 }

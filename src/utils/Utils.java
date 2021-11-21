@@ -36,9 +36,8 @@ public class Utils {
 		s = String.format("%s%s0x%s%x}", s, byteWord, leadingZero, a[a.length-1]);
 		return s;
 	}
-	public static String byteArrToHexStr(byte[] a) {
-		return byteArrToHexStr(a, false);
-	}
+	
+	public static String byteArrToHexStr(byte[] a) { return byteArrToHexStr(a, false); }
 	
 	public static void printArrayOfHexArrays(byte[][] arr){
 		for (byte[] a : arr) { System.out.println(Utils.byteArrToHexStr(a)); }
@@ -46,9 +45,7 @@ public class Utils {
 	
 	public static String byteArrayOfArraysAsHexArraysStr(byte[][] arr){
 		String s = "";
-		for (byte[] a : arr) {
-			s = String.format("%s\n%s", s, Utils.byteArrToHexStr(a));
-		}
+		for (byte[] a : arr) { s = String.format("%s\n%s", s, Utils.byteArrToHexStr(a)); }
 		return s;
 	}
 	
