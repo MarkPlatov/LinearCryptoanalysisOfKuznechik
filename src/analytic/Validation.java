@@ -1,4 +1,4 @@
-package tests;
+package analytic;
 
 public class Validation {
 	

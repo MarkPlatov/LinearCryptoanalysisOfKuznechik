@@ -53,4 +53,21 @@ public class Utils {
 		Random rnd = new Random();
 		return (byte) rnd.nextInt();
 	}
+	
+	public static byte[] byteToBinArr(byte b){
+		byte[] out = new byte[8];
+//		System.out.println(
+//				String.format("%8s", Integer.toBinaryString(b)).replace(' ', '0')
+//		);
+		
+		for (int i = 0; i < 8; i ++){
+			out[i] = (byte) (b & 1);
+			b >>= 1;
+//			System.out.println(out[i]);
+		}
+		return out;
+	}
+	public static String toBinaryString(byte b){
+		return String.format("%8s", Integer.toBinaryString(b)).replace(' ', '0');
+	}
 }

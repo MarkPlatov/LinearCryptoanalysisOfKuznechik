@@ -1,4 +1,4 @@
-package kuznechik;
+package cipher;
 
 import utils.EntriesBuildState;
 import utils.Utils;

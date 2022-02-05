@@ -1,44 +1,43 @@
-package tests;
+package analytic;
 
-import analytic.Prelude;
-import kuznechik.Builder;
+import cipher.Builder;
 import utils.Utils;
 
 public class Duration {
 	/**
-	 * Засекает время выполнения Prelude.oneBlockNotNull(numberOfRounds)
+	 * Засекает время выполнения Tests.oneBlockNotNull(numberOfRounds)
 	 *
 	 * Шифрует всевозможные входы с ПЕРВЫМ ненулевым блоком
 	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
 	 * Возвращает массив ШТ
 	 **/
-	public static void oneBlockNotNull(){
+	public static void oneBlockTest(){
 		long start, stop = 0;
 		
 		start = System.currentTimeMillis();
-		Prelude.oneBlockTest();
+		Tests.oneBlockTest();
 		
 		testStop(start, stop);
 	}
 	
 	/**
-	 * Засекает время выполнения Prelude.oneBlockNotNull(numberOfRounds)
+	 * Засекает время выполнения Tests.oneBlockNotNull(numberOfRounds)
 	 *
 	 * Шифрует всевозможные входы с ПЕРВЫМ ненулевым блоком
 	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
 	 * Возвращает массив ШТ
 	 **/
-	public static void twoBlockTest(int numberOfRounds, boolean verbose, byte goodByte){
+	public static void twoBlockTest(){
 		long start, stop = 0;
 		
 		start = System.currentTimeMillis();
-		Prelude.twoBlockTest();
+		Tests.twoBlockTest();
 		
 		testStop(start, stop);
 	}
 	
 	/**
-	 * Засекает время выполнения Prelude.oneBlockNotNull(numberOfRounds)
+	 * Засекает время выполнения Tests.oneBlockNotNull(numberOfRounds)
 	 *
 	 * Шифрует всевозможные входы с ПЕРВЫМ ненулевым блоком
 	 * на numberOfRounds раунда. Использует НУЛЕВЫЕ ИТЕРАЦИОННЫЕ КЛЮЧИ.
@@ -48,7 +47,7 @@ public class Duration {
 		long start, stop = 0;
 		
 		start = System.currentTimeMillis();
-		Prelude.threeBlockTest();
+		Tests.threeBlockTest();
 		
 		testStop(start, stop);
 	}

@@ -1,6 +1,6 @@
 package utils;
 
-import kuznechik.Crypt;
+import cipher.Crypt;
 
 public class Constants {
 	public static final byte[] EXAMPLE_KUZNECHIK_KEY = {

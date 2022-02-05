@@ -1,4 +1,4 @@
-package kuznechik;
+package cipher;
 
 import utils.Utils;
 import java.util.Arrays;

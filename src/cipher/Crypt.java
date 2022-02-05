@@ -1,4 +1,4 @@
-package kuznechik;
+package cipher;
 
 import utils.Utils;
 
@@ -15,7 +15,7 @@ public class Crypt {
 	};
 	
 	// Таблица прямого нелинейного преобразования
-	static final byte[] PI = {
+	static public final byte[] PI = {
 			(byte) 0xFC, (byte) 0xEE, (byte) 0xDD, (byte) 0x11, (byte) 0xCF, (byte) 0x6E, (byte) 0x31, (byte) 0x16,
 			(byte) 0xFB, (byte) 0xC4, (byte) 0xFA, (byte) 0xDA, (byte) 0x23, (byte) 0xC5, (byte) 0x04, (byte) 0x4D,
 			(byte) 0xE9, (byte) 0x77, (byte) 0xF0, (byte) 0xDB, (byte) 0x93, (byte) 0x2E, (byte) 0x99, (byte) 0xBA,
@@ -48,10 +48,28 @@ public class Crypt {
 			(byte) 0xCB, (byte) 0x9B, (byte) 0x25, (byte) 0xD0, (byte) 0xBE, (byte) 0xE5, (byte) 0x6C, (byte) 0x52,
 			(byte) 0x59, (byte) 0xA6, (byte) 0x74, (byte) 0xD2, (byte) 0xE6, (byte) 0xF4, (byte) 0xB4, (byte) 0xC0,
 			(byte) 0xD1, (byte) 0x66, (byte) 0xAF, (byte) 0xC2, (byte) 0x39, (byte) 0x4B, (byte) 0x63, (byte) 0xB6,
+			
+			
+			/*FC, EE, DD, 11, CF, 6E, 31, 16, FB, C4, FA, DA, 23, C5, 04, 4D,
+			E9, 77, F0, DB, 93, 2E, 99, BA, 17, 36, F1, BB, 14, CD, 5F, C1,
+			F9, 18, 65, 5A, E2, 5C, EF, 21, 81, 1C, 3C, 42, 8B, 01, 8E, 4F,
+			05, 84, 02, AE, E3, 6A, 8F, A0, 06, 0B, ED, 98, 7F, D4, D3, 1F,
+			EB, 34, 2C, 51, EA, C8, 48, AB, F2, 2A, 68, A2, FD, 3A, CE, CC,
+			B5, 70, 0E, 56, 08, 0C, 76, 12, BF, 72, 13, 47, 9C, B7, 5D, 87,
+			15, A1, 96, 29, 10, 7B, 9A, C7, F3, 91, 78, 6F, 9D, 9E, B2, B1,
+			32, 75, 19, 3D, FF, 35, 8A, 7E, 6D, 54, C6, 80, C3, BD, 0D, 57,
+			DF, F5, 24, A9, 3E, A8, 43, C9, D7, 79, D6, F6, 7C, 22, B9, 03,
+			E0, 0F, EC, DE, 7A, 94, B0, BC, DC, E8, 28, 50, 4E, 33, 0A, 4A,
+			A7, 97, 60, 73, 1E, 00, 62, 44, 1A, B8, 38, 82, 64, 9F, 26, 41,
+			AD, 45, 46, 92, 27, 5E, 55, 2F, 8C, A3, A5, 7D, 69, D5, 95, 3B,
+			07, 58, B3, 40, 86, AC, 1D, F7, 30, 37, 6B, E4, 88, D9, E7, 89,
+			E1, 1B, 83, 49, 4C, 3F, F8, FE, 8D, 53, AA, 90, CA, D8, 85, 61,
+			20, 71, 67, A4, 2D, 2B, 09, 5B, CB, 9B, 25, D0, BE, E5, 6C, 52,
+			59, A6, 74, D2, E6, F4, B4, C0, D1, 66, AF, C2, 39, 4B, 63, B6,*/
 	};
 	
 	// Таблица обратного нелинейного преобразования
-	static final byte[] REVERSE_PI = {
+	static final public byte[] REVERSE_PI = {
 			(byte) 0xA5, (byte) 0x2D, (byte) 0x32, (byte) 0x8F, (byte) 0x0E, (byte) 0x30, (byte) 0x38, (byte) 0xC0,
 			(byte) 0x54, (byte) 0xE6, (byte) 0x9E, (byte) 0x39, (byte) 0x55, (byte) 0x7E, (byte) 0x52, (byte) 0x91,
 			(byte) 0x64, (byte) 0x03, (byte) 0x57, (byte) 0x5A, (byte) 0x1C, (byte) 0x60, (byte) 0x07, (byte) 0x18,
@@ -140,7 +158,7 @@ public class Crypt {
 	}
 	
 	// Функция S
-	static private byte[] funcS(byte[] in_data, boolean reverse) {
+	static public byte[] transformS(byte[] in_data, boolean reverse) {
 		byte[] out_data = new byte[in_data.length];
 		int data;
 		byte[] pi = reverse ? REVERSE_PI : PI;
@@ -193,7 +211,7 @@ public class Crypt {
 		return internal;
 	}
 	
-	static private byte[] transformL(byte[] in_data) {
+	static public byte[] transformL(byte[] in_data) {
 		byte[] out_data;
 		byte[] internal = in_data;
 		
@@ -203,7 +221,7 @@ public class Crypt {
 		return out_data;
 	}
 	
-	static private byte[] transformLReverse(byte[] in_data) {
+	static public byte[] transformLReverse(byte[] in_data) {
 		byte[] out_data;
 		byte[] internal = in_data;
 		
@@ -236,7 +254,7 @@ public class Crypt {
 		key[1] = in_key_0;
 		
 		internal = xor(in_key_0, iter_const);
-		internal = funcS(internal, false);
+		internal = transformS(internal, false);
 		internal = transformL(internal);
 		key[0] = xor(internal, in_key_1);
 		return key;
@@ -284,14 +302,14 @@ public class Crypt {
 	// Функция шифрования блока на 1 раунд
 	public byte[] encryptOneRoundZeroKey(byte[] blk) {
 		byte[] out_blk = blk;
-		out_blk = funcS(out_blk, false);
+		out_blk = transformS(out_blk, false);
 		out_blk = transformL(out_blk);
 		return out_blk;
 	}
 	public byte[] decryptOneRoundZeroKey(byte[] blk) {
 		byte[] out_blk = blk;
 		out_blk = transformLReverse(out_blk);
-		out_blk = funcS(out_blk, true);
+		out_blk = transformS(out_blk, true);
 		return out_blk;
 	}
 
@@ -311,7 +329,7 @@ public class Crypt {
 					"xor(iterKey[i], out_blk) = \n" +
 					Utils.byteArrToHexStr(out_blk)
 			);
-			out_blk = funcS(out_blk, false);
+			out_blk = transformS(out_blk, false);
 			System.out.println(
 					"funcS(out_blk, false) = \n" +
 					Utils.byteArrToHexStr(out_blk)
@@ -338,7 +356,7 @@ public class Crypt {
 		out_blk = xor(out_blk, iterKey[9]);
 		for(int i = 8; i >= 0; i--) {
 			out_blk = transformLReverse(out_blk);
-			out_blk = funcS(out_blk, true);
+			out_blk = transformS(out_blk, true);
 			out_blk = xor(iterKey[i], out_blk);
 		}
 		return out_blk;
@@ -355,7 +373,7 @@ public class Crypt {
 		
 		for(int i = numberOfRounds; i >= 0; i--) {
 			out_blk = transformLReverse(out_blk);
-			out_blk = funcS(out_blk, true);
+			out_blk = transformS(out_blk, true);
 			out_blk = xor(iterKey[i], out_blk);
 		}
 		return out_blk;
@@ -369,7 +387,7 @@ public class Crypt {
 		byte[] out_blk = blk;
 		for(int i = 0; i < numberOfRounds; i++) {
 			out_blk = xor(iterKey[i], out_blk);
-			out_blk = funcS(out_blk, false);
+			out_blk = transformS(out_blk, false);
 			out_blk = transformL(out_blk);
 		}
 		return out_blk;
@@ -390,7 +408,7 @@ public class Crypt {
 		out_blk[0] = blk;
 		for(int i = 1; i < numberOfRounds + 1; i++) {
 			out_blk[i] = transformLReverse(out_blk[i - 1]);
-			out_blk[i] = funcS(out_blk[i], true);
+			out_blk[i] = transformS(out_blk[i], true);
 			out_blk[i] = xor(iterKey[i], out_blk[i]);
 		}
 
@@ -408,7 +426,7 @@ public class Crypt {
 		out_blk[0] = blk;
 		for(int i = 1; i < numberOfRounds + 1; i++) {
 			out_blk[i] = xor(iterKey[i], out_blk[i - 1]);
-			out_blk[i] = funcS(out_blk[i], false);
+			out_blk[i] = transformS(out_blk[i], false);
 			out_blk[i] = transformL(out_blk[i]);
 		}
 		if (numberOfRounds == 9) {
